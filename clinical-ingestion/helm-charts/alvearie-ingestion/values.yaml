@@ -32,25 +32,25 @@ affinity: {}
 # Values: https://github.com/Alvearie/health-patterns/clinical-ingestion/helm-charts/fhir/values.yaml
 # ------------------------------------------------------------------------------
 fhir:
-  enabled: true 
+  enabled: true
 
 # ------------------------------------------------------------------------------
 # Nifi Registry
 # Values: https://github.com/cetic/helm-nifi/blob/master/values.yaml
 # ------------------------------------------------------------------------------
 nifi-registry:
-  # The fullname is overridden to some static name in order to automatically register the NiFi Registry with the NiFi deployment  
+  # The fullname is overridden to some static name in order to automatically register the NiFi Registry with the NiFi deployment
   fullnameOverride: ingestion-nifi-registry
 
 # ------------------------------------------------------------------------------
 # Zookeeper Configuration
-# Values: https://github.com/bitnami/charts/blob/master/bitnami/zookeeper/values.yaml 
+# Values: https://github.com/bitnami/charts/blob/master/bitnami/zookeeper/values.yaml
 # ------------------------------------------------------------------------------
 zookeeper:
   enabled: true
   # The zookeeper fullname is overridden so that the same instance deployed here by default can be referred to by both NiFi and Kafka
   fullnameOverride: ingestion-zookeeper
-  persistence: 
+  persistence:
     enabled: false
 
 # ------------------------------------------------------------------------------
@@ -58,9 +58,11 @@ zookeeper:
 # Values: https://github.com/cetic/helm-nifi/blob/master/values.yaml
 # ------------------------------------------------------------------------------
 nifi:
+  fullnameOverride: ingestion-nifi
   enabled: true
-  service: 
+  service:
     type: LoadBalancer
+
   url: ""
   port: 80
   zookeeper:
@@ -68,7 +70,7 @@ nifi:
     enabled: false
     url: ingestion-zookeeper
   registry:
-    ## We use a different NiFi Registry than the default one, that loads the flow from the Alvearie Github NiFi flow repository  
+    ## We use a different NiFi Registry than the default one, that loads the flow from the Alvearie Github NiFi flow repository
     enabled: false
     url: ingestion-nifi-registry
 
@@ -87,7 +89,7 @@ kafka:
   serviceAccount:
     create: true
   rbac:
-    create: true    
+    create: true
   persistence:
     # Persistence disabled in order to avoid having to delete the kafka PersistenceVolume created by the StatefulSet when re-deploying the chart to facilitate rapid deployment
     enabled: false
@@ -98,3 +100,16 @@ kafka:
     # The zookeeper server is overridden so that the same instance deployed here by default can be referred to by both NiFi and Kafka
     servers:
       - ingestion-zookeeper
+
+# ------------------------------------------------------------------------------
+# Nifi Metrics Configuration
+# This adds an additional scrape configuration that will expose Nifi /metrics
+# on the port defined
+# ------------------------------------------------------------------------------
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      additionalScrapeConfigs:
+        - job_name: 'nifi'
+          static_configs:
+            - targets: ['ingestion-nifi:12667']

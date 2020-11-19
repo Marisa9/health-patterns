@@ -1,12 +1,6 @@
 dependencies:
-- name: zookeeper
-  repository: https://charts.bitnami.com/bitnami
-  version: 6.0.0
-- name: nifi
-  repository: https://cetic.github.io/helm-charts
-  version: 0.6.0
-- name: kafka
-  repository: https://charts.bitnami.com/bitnami
-  version: 12.1.0
-digest: sha256:cf2518487c009ce27973042ba1359f2dce36096854d10d8d827b484eb5c83297
-generated: "2020-11-18T11:51:58.6136901-07:00"
+- name: kube-prometheus-stack
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 12.0.4
+digest: sha256:64fed934c003fe63bfa3c1d4d4394882e2c3842f73b5d82d81725da21b8e8a9e
+generated: "2020-11-19T07:53:06.704877-06:00"
