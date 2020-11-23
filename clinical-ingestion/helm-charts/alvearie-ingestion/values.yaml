@@ -63,6 +63,13 @@ nifi:
   service:
     type: LoadBalancer
 
+    processors:
+      enabled: true
+      ports:
+        - name: nifi-metrics
+          port: 12667
+          targetPort: 12667
+
   url: ""
   port: 80
   zookeeper:
@@ -73,6 +80,7 @@ nifi:
     ## We use a different NiFi Registry than the default one, that loads the flow from the Alvearie Github NiFi flow repository
     enabled: false
     url: ingestion-nifi-registry
+
 
 # ------------------------------------------------------------------------------
 # Kafka Configuration
@@ -101,15 +109,52 @@ kafka:
     servers:
       - ingestion-zookeeper
 
+  metrics:
+    ## Prometheus Kafka Exporter: exposes complimentary metrics to JMX Exporter
+    ##
+    kafka:
+      enabled: true
+    ## Prometheus JMX Exporter: exposes the majority of Kafkas metrics
+    ##
+    jmx:
+      enabled: true
+
+    serviceMonitor:
+      enabled: true
+
+# ------------------------------------------------------------------------------
+# Prometheus-Grafana stack Configuration
+# This will add specific configuration for the new grafana-prometheusSpec
+# monitoring stack so that nifi and kafka will both generate metrics to a
+# externally available grafana
+# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # Nifi Metrics Configuration
 # This adds an additional scrape configuration that will expose Nifi /metrics
 # on the port defined
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Kafka Metrics Configuration
+# This adds an additional scrape configuration that will expose Kafka /metrics
+# on the port defined.  Note there are two kafka type metrics
+# ------------------------------------------------------------------------------
 kube-prometheus-stack:
+  grafana:
+    adminPassword: admin
+    service:
+      type: LoadBalancer
+
   prometheus:
     prometheusSpec:
       additionalScrapeConfigs:
         - job_name: 'nifi'
           static_configs:
             - targets: ['ingestion-nifi:12667']
+
+        - job_name: 'kafka-metrics'
+          static_configs:
+            - targets: ['stack-kafka-metrics:9308']
+
+        - job_name: 'kafka-jmx-metrics'
+          static_configs:
+            - targets: ['stack-kafka-jmx-metrics:5556']
