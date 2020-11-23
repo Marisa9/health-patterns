@@ -139,6 +139,7 @@ kafka:
 # on the port defined.  Note there are two kafka type metrics
 # ------------------------------------------------------------------------------
 kube-prometheus-stack:
+  enabled: true
   grafana:
     adminPassword: admin
     service:
