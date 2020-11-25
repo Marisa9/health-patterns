@@ -34,6 +34,9 @@ affinity: {}
 fhir:
   enabled: true 
 
+fhir-deid:
+  enabled: true 
+
 # ------------------------------------------------------------------------------
 # Nifi Registry
 # Values: https://github.com/cetic/helm-nifi/blob/master/values.yaml
@@ -98,3 +101,10 @@ kafka:
     # The zookeeper server is overridden so that the same instance deployed here by default can be referred to by both NiFi and Kafka
     servers:
       - ingestion-zookeeper
+
+# ------------------------------------------------------------------------------
+# De-Identification Service
+# Values: https://github.com/Alvearie/health-patterns/clinical-ingestion/helm-charts/deid/values.yaml
+# ------------------------------------------------------------------------------
+deid:
+  enabled: true
